@@ -7,17 +7,24 @@ resource "aws_vpc" "vpc" {
 }
 
 resource "aws_subnet" "private" {
+  count = length(var.private_subnet_cidrs)
   vpc_id     = aws_vpc.vpc.id
-  cidr_block = var.private_subnet_cidr
+  cidr_block = var.private_subnet_cidrs[count.index]
 
-  tags = merge(local.tags, { "Name" = "wordpress-private-subnet" })
+  tags = merge(local.tags, { "Name" = "wordpress-private-subnet-${count.index}" })
 }
 
 resource "aws_subnet" "public" {
-  vpc_id     = aws_vpc.vpc.id
-  cidr_block = var.public_subnet_cidr
+  depends_on = [aws_subnet.private]
 
-  tags = merge(local.tags, { "Name" = "wordpress-public-subnet" })
+  count = length(var.private_subnet_cidrs) # this is to ensure that the number of public subnets matches the number of private subnets
+
+  vpc_id     = aws_vpc.vpc.id
+  cidr_block = var.public_subnet_cidrs[count.index]
+  availability_zone_id = aws_subnet.private[count.index].availability_zone_id # match the AZs of the private subnets to the public subnets
+  map_public_ip_on_launch = true # to make this a proper public subnet
+
+  tags = merge(local.tags, { "Name" = "wordpress-public-subnet-${count.index}" })
 }
 
 resource "aws_subnet" "db" {
@@ -44,6 +51,8 @@ resource "aws_route_table" "public_rt" {
 }
 
 resource "aws_route_table_association" "public_rt_association" {
-  subnet_id      = aws_subnet.public.id
+  count = length(var.private_subnet_cidrs)
+
+  subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public_rt.id
 }
