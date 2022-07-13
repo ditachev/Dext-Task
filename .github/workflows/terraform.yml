@@ -51,6 +51,7 @@ jobs:
       
     # Post tf plan output as a comment to the PR
     - name: Post Plan to GitHub PR
+      if: github.ref == 'refs/heads/"main"' && github.event_name == 'pull_request'
       uses: mshick/add-pr-comment@v1
       with:
         allow-repeats: true
@@ -61,5 +62,15 @@ jobs:
 
     # On push to "main", build or change infrastructure according to Terraform configuration files
     - name: Terraform Apply
+      id: apply
       if: github.ref == 'refs/heads/"main"' && github.event_name == 'push'
       run: terraform apply -auto-approve -input=false
+      
+    - name: Post Apply to Github PR
+      if: github.ref == 'refs/heads/"main"' && github.event_name == 'push'
+      uses: mshick/add-pr-comment@v1
+      with:
+        allow-repeats: true
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        repo-token-user-login: 'github-actions[bot]'
+        message: ${{ steps.apply.outputs.stdout || steps.apply.outputs.stderr }}
