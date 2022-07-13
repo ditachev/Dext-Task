@@ -18,7 +18,39 @@ variable "private_subnet_cidr" {
   default     = "10.1.1.0/24"
 }
 
-variable "db_subnet_cidr" {
-  description = "CIDR block for the db subnet"
-  default     = "10.1.2.0/24"
+variable "db_subnet_cidrs" {
+  description = "CIDR blocks for the db subnets"
+  default     = ["10.1.2.0/24", "10.1.3.0/24"]
+}
+
+variable "db_name" {
+  description = "Name of the MySQL RDS instance"
+  default     = "wp-db"
+}
+
+variable "db_username" {
+  description = "Name of the MySQL RDS instance user"
+  type        = string
+  sensitive   = true
+}
+
+variable "db_password" {
+  description = "Password of the MySQL RDS instance user"
+  type        = string
+  sensitive   = true
+}
+
+variable "db_engine" {
+  description = "Engine of the RDS instance"
+  default     = "mysql"
+}
+
+variable "db_engine_version" {
+  description = "Version of the RDS instance engine"
+  default     = "5.7"
+}
+
+variable "db_instance_class" {
+  description = "Instance class of the RDS instance"
+  default     = "db.t2.micro"
 }
