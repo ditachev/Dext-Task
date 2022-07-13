@@ -68,12 +68,3 @@ jobs:
       id: apply
       if: steps.plan.outcome == 'success'
       run: terraform apply -var db_username=$DB_USERNAME -var db_password=$DB_PASSWORD -auto-approve -input=false
-      
-    - name: Post Apply to Github PR
-      if: steps.plan.outcome == 'success'
-      uses: mshick/add-pr-comment@v1
-      with:
-        allow-repeats: true
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        repo-token-user-login: 'github-actions[bot]'
-        message: ${{ steps.apply.outputs.stdout || steps.apply.outputs.stderr }}
