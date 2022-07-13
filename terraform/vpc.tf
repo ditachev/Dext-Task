@@ -6,10 +6,15 @@ resource "aws_vpc" "vpc" {
   tags = merge(local.tags, { "Name" = "wordpress-vpc" })
 }
 
+data "aws_availability_zones" "az" {
+  state = "available"
+}
+
 resource "aws_subnet" "private" {
-  count      = length(var.private_subnet_cidrs)
-  vpc_id     = aws_vpc.vpc.id
-  cidr_block = var.private_subnet_cidrs[count.index]
+  count             = length(var.private_subnet_cidrs)
+  vpc_id            = aws_vpc.vpc.id
+  cidr_block        = var.private_subnet_cidrs[count.index]
+  availability_zone = data.aws_availability_zones.az.names[count.index]
 
   tags = merge(local.tags, { "Name" = "wordpress-private-subnet-${count.index}" })
 }
@@ -28,9 +33,10 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_subnet" "db" {
-  count      = length(var.db_subnet_cidrs)
-  vpc_id     = aws_vpc.vpc.id
-  cidr_block = var.db_subnet_cidrs[count.index]
+  count             = length(var.db_subnet_cidrs)
+  vpc_id            = aws_vpc.vpc.id
+  cidr_block        = var.db_subnet_cidrs[count.index]
+  availability_zone = data.aws_availability_zones.az.names[count.index]
 
   tags = merge(local.tags, { "Name" = "wordpress-db-subnet-${count.index}" })
 }
