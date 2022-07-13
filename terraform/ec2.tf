@@ -16,12 +16,11 @@ resource "aws_security_group" "web_sg" {
   }
 
   ingress {
-    from_port   = 22
-    to_port     = 22
+    from_port   = 8000
+    to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["89.215.52.170/32"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
-
   egress {
     from_port        = 0
     to_port          = 0
@@ -64,4 +63,65 @@ resource "aws_instance" "web_server" {
   }
 
   tags = merge(local.tags, { "Name" = "wordpress-server-${count.index}" })
+}
+
+resource "aws_security_group" "lb_sg" {
+  vpc_id = aws_vpc.vpc.id
+  name   = "lb-sg"
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.web_sg.id]
+  }
+
+  egress {
+    from_port       = 8000
+    to_port         = 8000
+    protocol        = "tcp"
+    security_groups = [aws_security_group.web_sg.id]
+  }
+
+  tags = local.tags
+}
+
+resource "aws_elb" "elb" {
+  name               = "wordpress-load-balancer"
+  availability_zones = aws_subnet.public[*].availability_zone_id
+  security_groups    = [aws_security_group.lb_sg.id]
+  internal           = false
+
+  access_logs {
+    bucket        = "825144470306-terraform-state"
+    bucket_prefix = "wordpress/elb"
+  }
+
+  listener {
+    instance_port     = 80
+    instance_protocol = "http"
+    lb_port           = 80
+    lb_protocol       = "http"
+  }
+
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 3
+    target              = "HTTP:8000/"
+    interval            = 30
+  }
+
+  instances                   = aws_instance.web_server[*].id
+  idle_timeout                = 400
+  connection_draining         = true
+  connection_draining_timeout = 400
+
+  tags = local.tags
 }
