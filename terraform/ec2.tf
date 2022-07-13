@@ -54,14 +54,14 @@ resource "aws_instance" "web_server" {
 
   count = var.web_server_count
 
-  ami = data.aws_ami.linux2_ami.id
-  instance_type = var.web_server_instance_class
-  subnet_id = aws_subnet.private[count.index].id
+  ami                    = data.aws_ami.linux2_ami.id
+  instance_type          = var.web_server_instance_class
+  subnet_id              = aws_subnet.private[count.index].id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
 
   root_block_device {
     volume_size = var.web_server_disk_size
   }
 
-  tags = merge(local.tags, {"Name" = "wordpress-server-${count.index}"})
+  tags = merge(local.tags, { "Name" = "wordpress-server-${count.index}" })
 }

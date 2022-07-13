@@ -57,15 +57,15 @@ variable "db_instance_class" {
 
 variable "web_server_count" {
   description = "Count of the web server instances"
-  default = 2
+  default     = 2
 }
 
 variable "web_server_instance_class" {
   description = "Instance class of the web server instance"
-  default = "t2.micro" 
+  default     = "t2.micro"
 }
 
 variable "web_server_disk_size" {
   description = "Disk size of the web server instance"
-  default = 30 # GB
+  default     = 30 # GB
 }
