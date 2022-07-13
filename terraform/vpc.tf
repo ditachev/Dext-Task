@@ -21,18 +21,11 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_subnet" "db" {
-  count = length(var.db_subnet_cidrs)
+  count      = length(var.db_subnet_cidrs)
   vpc_id     = aws_vpc.vpc.id
   cidr_block = var.db_subnet_cidrs[count.index]
 
   tags = merge(local.tags, { "Name" = "wordpress-db-subnet-${count.index}" })
-}
-
-resource "aws_db_subnet_group" "rds_subnet_group" {
-  name = "rds-subnet-group"
-  subnet_ids = aws_subnet.db[*].id
-
-  tags = local.tags
 }
 
 resource "aws_internet_gateway" "igw" {
