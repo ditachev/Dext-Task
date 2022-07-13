@@ -8,14 +8,14 @@ variable "vpc_cidr" {
   default     = "10.1.0.0/16"
 }
 
-variable "public_subnet_cidr" {
-  description = "CIDR block for the public subnet"
-  default     = "10.1.111.0/24"
+variable "public_subnet_cidrs" {
+  description = "CIDR blocks for the public subnets"
+  default     = ["10.1.111.0/24", "10.1.112.0/24"]
 }
 
-variable "private_subnet_cidr" {
-  description = "CIDR block for the private subnet"
-  default     = "10.1.1.0/24"
+variable "private_subnet_cidrs" {
+  description = "CIDR block for the private subnets"
+  default     = ["10.1.1.0/24", "10.1.4.0/24"]
 }
 
 variable "db_subnet_cidrs" {
@@ -53,4 +53,19 @@ variable "db_engine_version" {
 variable "db_instance_class" {
   description = "Instance class of the RDS instance"
   default     = "db.t2.micro"
+}
+
+variable "web_server_count" {
+  description = "Count of the web server instances"
+  default     = 2
+}
+
+variable "web_server_instance_class" {
+  description = "Instance class of the web server instance"
+  default     = "t2.micro"
+}
+
+variable "web_server_disk_size" {
+  description = "Disk size of the web server instance"
+  default     = 30 # GB
 }
