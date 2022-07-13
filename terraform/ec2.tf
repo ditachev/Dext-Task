@@ -15,12 +15,6 @@ resource "aws_security_group" "web_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  ingress {
-    from_port   = 8000
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
   egress {
     from_port        = 0
     to_port          = 0
@@ -82,13 +76,6 @@ resource "aws_security_group" "lb_sg" {
     security_groups = [aws_security_group.web_sg.id]
   }
 
-  egress {
-    from_port       = 8000
-    to_port         = 8000
-    protocol        = "tcp"
-    security_groups = [aws_security_group.web_sg.id]
-  }
-
   tags = local.tags
 }
 
@@ -114,7 +101,7 @@ resource "aws_elb" "elb" {
     healthy_threshold   = 2
     unhealthy_threshold = 2
     timeout             = 3
-    target              = "HTTP:8000/"
+    target              = "HTTP:80/"
     interval            = 30
   }
 
