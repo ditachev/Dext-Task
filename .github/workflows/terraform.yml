@@ -51,7 +51,7 @@ jobs:
       
     # Post tf plan output as a comment to the PR
     - name: Post Plan to GitHub PR
-      if: github.ref == 'refs/heads/"main"' && github.event_name == 'pull_request'
+      if: github.event_name == 'pull_request'
       uses: mshick/add-pr-comment@v1
       with:
         allow-repeats: true
