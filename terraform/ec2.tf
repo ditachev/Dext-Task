@@ -79,9 +79,16 @@ resource "aws_security_group" "lb_sg" {
   tags = local.tags
 }
 
+data "aws_availability_zone" "az" {
+  filter {
+    name   = "zone-id"
+    values = aws_subnet.public[*].availability_zone_id
+  }
+}
+
 resource "aws_elb" "elb" {
   name               = "wordpress-load-balancer"
-  availability_zones = aws_subnet.public[*].availability_zone_id
+  availability_zones = data.aws_availability_zone.az[*].name
   security_groups    = [aws_security_group.lb_sg.id]
   internal           = false
 
