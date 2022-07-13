@@ -1,19 +1,3 @@
-terraform {
-  backend "s3" {
-    bucket = "825144470306-terraform-state"
-    key    = "terraform.tfstate"
-    region = "eu-west-1"
-  }
-}
-
-locals {
-  tags = {
-    Owner       = "dimitartachev"
-    App         = "wordpress"
-    Provisioner = "terraform"
-  }
-}
-
 resource "aws_vpc" "vpc" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
@@ -29,18 +13,26 @@ resource "aws_subnet" "private" {
   tags = merge(local.tags, { "Name" = "wordpress-private-subnet" })
 }
 
-resource "aws_subnet" "db" {
-  vpc_id     = aws_vpc.vpc.id
-  cidr_block = var.db_subnet_cidr
-
-  tags = merge(local.tags, { "Name" = "wordpress-db-subnet" })
-}
-
 resource "aws_subnet" "public" {
   vpc_id     = aws_vpc.vpc.id
   cidr_block = var.public_subnet_cidr
 
   tags = merge(local.tags, { "Name" = "wordpress-public-subnet" })
+}
+
+resource "aws_subnet" "db" {
+  count = length(var.db_subnet_cidrs)
+  vpc_id     = aws_vpc.vpc.id
+  cidr_block = var.db_subnet_cidrs[count.index]
+
+  tags = merge(local.tags, { "Name" = "wordpress-db-subnet-${count.index}" })
+}
+
+resource "aws_db_subnet_group" "rds_subnet_group" {
+  name = "rds-subnet-group"
+  subnet_ids = aws_subnet.db[*].id
+
+  tags = local.tags
 }
 
 resource "aws_internet_gateway" "igw" {
