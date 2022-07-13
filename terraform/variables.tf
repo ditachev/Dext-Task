@@ -25,7 +25,7 @@ variable "db_subnet_cidrs" {
 
 variable "db_name" {
   description = "Name of the MySQL RDS instance"
-  default     = "wp-db"
+  default     = "wp_db"
 }
 
 variable "db_username" {
