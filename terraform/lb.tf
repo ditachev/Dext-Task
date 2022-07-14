@@ -38,6 +38,18 @@ resource "aws_lb_target_group" "tg" {
   protocol = "HTTP"
   vpc_id   = aws_vpc.vpc.id
 
+  deregistration_delay = 30
+  target_type          = "instance"
+
+  health_check {
+    enabled             = true
+    path                = "/"
+    port                = 80
+    timeout             = 15
+    healthy_threshold   = 3
+    unhealthy_threshold = 3
+  }
+
   tags = local.tags
 }
 

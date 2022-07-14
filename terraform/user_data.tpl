@@ -1,4 +1,9 @@
 #! /bin/bash
+db_name=${db_name}
+db_username=${db_username}
+db_password=${db_password}
+db_rds_endpoint=${db_rds_endpoint}
+
 yum install -y httpd mysql
 amazon-linux-extras enable php7.4
 yum install -y php php-{pear,cgi,common,curl,mbstring,gd,mysqlnd,gettext,bcmath,json,xml,fpm,intl,zip,imap,devel}
