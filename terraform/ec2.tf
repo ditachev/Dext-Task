@@ -42,6 +42,16 @@ data "aws_ami" "linux2_ami" {
   }
 }
 
+data "template_file" "user_data" {
+    template = file("./user_data.tpl")
+    vars = {
+      db_name = var.db_name
+      db_username = var.db_username
+      db_password = var.db_password
+      db_rds_endpoint = aws_db_instance.rds.endpoint
+    }
+}
+
 resource "aws_instance" "web_server" {
   depends_on = [aws_db_instance.rds]
 
@@ -51,6 +61,8 @@ resource "aws_instance" "web_server" {
   instance_type          = var.web_server_instance_class
   subnet_id              = aws_subnet.private[count.index].id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
+
+  user_data = data.template_file.user_data.rendered
 
   root_block_device {
     volume_size = var.web_server_disk_size
