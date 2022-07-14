@@ -29,7 +29,7 @@ The applications communicate with a single MySQL RDS instance.
 
 2 public subnets to host the load balancer  
 
-2 private subnets to host the web servers  
+2 private subnets to host the web servers(due to problems while developing the solution the web servers are currently in the public subnets)  
 
 2 database subnets which create a database subnet group that the RDS instance uses to create multi-AZ database  
 
