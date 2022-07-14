@@ -1,9 +1,14 @@
 #! /bin/bash
-hostname=$(curl -s http://169.254.169.254/latest/meta-data/public-hostname)
-
 yum install -y httpd mysql
 amazon-linux-extras enable php7.4
-yum install -y php-cli php-pdo php-fpm php-json php-mysqlnd
+yum install -y php php-{pear,cgi,common,curl,mbstring,gd,mysqlnd,gettext,bcmath,json,xml,fpm,intl,zip,imap,devel}
+
+systemctl restart php-fpm.service
+
+usermod -a -G apache ec2-user
+chown -R ec2-user:apache /var/www
+find /var/www -type d -exec chmod 2775 {} \;
+find /var/www -type f -exec chmod 0664 {} \;
 
 cd /var/www/html
 
@@ -24,6 +29,13 @@ define( 'FS_METHOD', 'direct' );
 define('WP_MEMORY_LIMIT', '128M');
 PHP
 
-wp core install --url=$hostname --title="Linux Namespaces" --admin_name=$db_username --admin_password=$db_password --admin_email=admin@admin.com
+chown -R ec2-user:apache /var/www/html
+chmod -R 774 /var/www/html
+
+sed -i '/<Directory "\/var\/www\/html">/,/<\/Directory>/ s/AllowOverride None/AllowOverride all/' /etc/httpd/conf/httpd.conf
+
+systemctl restart httpd
+
+wp core install --url=localhost --title="Linux Namespaces" --admin_name=$db_username --admin_password=$db_password --admin_email=admin@admin.com --allow-root
 
 systemctl restart httpd
