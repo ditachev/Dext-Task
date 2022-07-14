@@ -1,8 +1,9 @@
 #! /bin/bash
-db_name=${db_name}
-db_username=${db_username}
-db_password=${db_password}
-db_rds_endpoint=${db_rds_endpoint}
+db_name='${db_name}'
+db_username='${db_username}'
+db_password='${db_password}'
+db_rds_endpoint='${db_rds_endpoint}'
+site_url='${site_url}'
 
 yum install -y httpd mysql
 amazon-linux-extras enable php7.4
@@ -29,18 +30,15 @@ chmod +x wp-cli.phar
 mv wp-cli.phar /usr/local/bin/wp
 wp core download --path=/var/www/html --allow-root
 
-wp config create --dbname=$db_name --dbuser=$db_username --dbpass=$db_password --dbhost=$db_rds_endpoint --path=/var/www/html --allow-root --extra-php <<PHP
-define( 'FS_METHOD', 'direct' );
-define('WP_MEMORY_LIMIT', '128M');
-PHP
+wp config create --dbname=$db_name --dbuser=$db_username --dbpass=$db_password --dbhost=$db_rds_endpoint --path=/var/www/html --allow-root
 
 chown -R ec2-user:apache /var/www/html
 chmod -R 774 /var/www/html
 
-sed -i '/<Directory "\/var\/www\/html">/,/<\/Directory>/ s/AllowOverride None/AllowOverride all/' /etc/httpd/conf/httpd.conf
+# sed -i '/<Directory "\/var\/www\/html">/,/<\/Directory>/ s/AllowOverride None/AllowOverride all/' /etc/httpd/conf/httpd.conf
 
 systemctl restart httpd
 
-wp core install --url=localhost --title="Linux Namespaces" --admin_name=$db_username --admin_password=$db_password --admin_email=admin@admin.com --allow-root
+wp core install --url=$site_url --title="Linux Namespaces" --admin_name=$db_username --admin_password=$db_password --admin_email=admin@admin.com --allow-root
 
 systemctl restart httpd
