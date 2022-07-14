@@ -5,13 +5,14 @@ In order to run the terraform configuration you need to supply the AWS_ACCESS_KE
 
 ## Commands to run  
 
-Destroy infrastructure: *terraform destroy*
-Apply infrastructure: *terraform apply*
+Destroy infrastructure: *terraform destroy*  
+Apply infrastructure: *terraform apply*  
 
 You must supply a database username and password of choice, if you want to apply the configuration. The are 2 ways to go about this:
-    1. add the -var option to the command(e.g. *terraform apply -var db_username=<username> -var db_password=<password>* )
-    2. populate a *terraform.tfvars* file with the values like so: db_username=<username>
-                                                                   db_password=<password>
+    1. add the -var option to the command(e.g. *terraform apply -var db_username=username -var db_password=password* )
+    2. populate a *terraform.tfvars* file with the values like so:  
+    db_username=username  
+    db_password=password  
                  
                  
 This is necessary to keep the configuration secure and not expose these sensitive values in plain text.                                                     
